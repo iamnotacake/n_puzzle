@@ -1,0 +1,6 @@
+[package]
+name = "n_puzzle"
+version = "0.1.0"
+authors = ["alischyn"]
+
+[dependencies]
