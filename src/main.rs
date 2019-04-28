@@ -43,6 +43,11 @@ fn solve(
             _ => {}
         }
 
+        if stack.iter().any(|(_, prev_state)| prev_state == &new_state) {
+            println!("{}SKIPPING PREV STATE", " ".repeat(level));
+            continue;
+        }
+
         stack.push((direction, new_state));
 
         if solve(goal, goal_positions, stack, level + 1) {
@@ -72,12 +77,12 @@ fn main() {
     let state = State::new(size, table);
 
     // terminal.clear(ClearType::All);
-    println!("Have:");
-    print!("{}", state);
+    eprintln!("Have:");
+    eprint!("{}", state);
 
     let goal = state.goal();
-    println!("Need:");
-    print!("{}", goal);
+    eprintln!("Need:");
+    eprint!("{}", goal);
 
     let goal_positions = goal.goal_positions();
     let mut stack = Vec::with_capacity(128);
@@ -86,8 +91,8 @@ fn main() {
     let ret = solve(&goal, &goal_positions, &mut stack, 0);
 
     if ret {
-        println!("Solved with {} moves", stack.len() - 1);
+        eprintln!("Solved with {} moves", stack.len() - 1);
     } else {
-        println!("Not solved");
+        eprintln!("Not solved");
     }
 }
