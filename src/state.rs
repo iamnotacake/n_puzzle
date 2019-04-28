@@ -14,6 +14,11 @@ impl State {
     }
 
     #[inline]
+    pub fn size(&self) -> usize {
+        self.size
+    }
+
+    #[inline]
     pub fn at(&self, (y, x): (i32, i32)) -> i32 {
         self.table[y as usize * self.size + x as usize]
     }
