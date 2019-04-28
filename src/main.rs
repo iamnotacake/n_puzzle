@@ -10,10 +10,10 @@ fn solve(
     goal: &State,
     goal_positions: &Vec<(i32, i32)>,
     stack: &mut Vec<(MoveDirection, State)>,
-    level: usize,
 ) -> bool {
     let (last_move, state) = &stack[stack.len() - 1];
     let last_move = last_move.clone();
+    let level = stack.len() - 1;
 
     if level > 20 {
         return false;
@@ -50,7 +50,7 @@ fn solve(
 
         stack.push((direction, new_state));
 
-        if solve(goal, goal_positions, stack, level + 1) {
+        if solve(goal, goal_positions, stack) {
             return true;
         } else {
             stack.pop();
@@ -88,7 +88,7 @@ fn main() {
     let mut stack = Vec::with_capacity(128);
     stack.push((MoveDirection::None, state.clone()));
 
-    let ret = solve(&goal, &goal_positions, &mut stack, 0);
+    let ret = solve(&goal, &goal_positions, &mut stack);
 
     if ret {
         eprintln!("Solved with {} moves", stack.len() - 1);
