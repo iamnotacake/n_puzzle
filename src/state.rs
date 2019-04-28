@@ -1,3 +1,4 @@
+use super::manhattan_dist;
 use std::fmt;
 
 #[derive(Clone)]
@@ -143,6 +144,19 @@ impl<'a> State {
     #[inline]
     pub fn at(&self, (y, x): (i32, i32)) -> i32 {
         self.table[y as usize * self.size + x as usize]
+    }
+
+    pub fn total_manhattan_dist(&self, goal: &Vec<(i32, i32)>) -> i32 {
+        let mut total_dist = 0;
+
+        for ((y, x), val) in self.cells() {
+            // don't count bad empty cell position
+            if val != 0 {
+                total_dist += manhattan_dist((y, x), goal[val as usize]);
+            }
+        }
+
+        total_dist
     }
 }
 

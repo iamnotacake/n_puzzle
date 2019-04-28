@@ -35,4 +35,6 @@ fn main() {
     for (val, (y, x)) in goal_positions.iter().enumerate() {
         eprintln!("({}, {}) must be {}", y, x, val);
     }
+
+    dbg!(state.total_manhattan_dist(&goal_positions));
 }
