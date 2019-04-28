@@ -23,5 +23,10 @@ fn main() {
     let state = State::new(size, table);
 
     // terminal.clear(ClearType::All);
+    println!("Have:");
     print!("{}", state);
+
+    let goal = state.goal();
+    println!("Need:");
+    print!("{}", goal);
 }
