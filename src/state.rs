@@ -1,7 +1,7 @@
 use super::{manhattan_dist, MoveDirection};
 use std::fmt;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub struct State {
     size: usize,
     table: Vec<i32>,
@@ -273,6 +273,12 @@ impl fmt::Display for State {
         )?;
 
         Ok(())
+    }
+}
+
+impl std::cmp::PartialEq<State> for State {
+    fn eq(&self, other: &State) -> bool {
+        self.table == other.table
     }
 }
 
