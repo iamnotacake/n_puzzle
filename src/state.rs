@@ -8,7 +8,7 @@ pub struct State {
     empty: (i32, i32),
 }
 
-impl State {
+impl<'a> State {
     pub fn new(size: usize, table: Vec<i32>) -> State {
         assert_eq!(table.len(), size * size);
 
@@ -23,6 +23,14 @@ impl State {
         let empty = ((empty_index / size) as i32, (empty_index % size) as i32);
 
         State { size, table, empty }
+    }
+
+    fn cells(&'a self) -> StateCellIterator<'a> {
+        StateCellIterator {
+            state: &self,
+            curr: 0,
+            end: self.table.len() - 1,
+        }
     }
 
     /// Return solved state so we can compare intermediate states with goal
@@ -110,6 +118,23 @@ impl State {
         State::new(self.size, table)
     }
 
+    /// Returns vector where you put cell value as index and get target cell position.
+    /// For 3x3 it would be:
+    ///   [0] -> (1, 1)
+    ///   [1] -> (0, 0)
+    ///   [2] -> (0, 1)
+    ///   [3] -> (0, 2)
+    ///   and so on
+    pub fn goal_positions(&self) -> Vec<(i32, i32)> {
+        let mut res = vec![(0, 0); self.table.len()];
+
+        for ((y, x), val) in self.cells() {
+            res[val as usize] = (y, x);
+        }
+
+        res
+    }
+
     #[inline]
     pub fn size(&self) -> usize {
         self.size
@@ -156,5 +181,30 @@ impl fmt::Display for State {
         )?;
 
         Ok(())
+    }
+}
+
+struct StateCellIterator<'a> {
+    state: &'a State,
+    curr: usize,
+    end: usize,
+}
+
+impl<'a> Iterator for StateCellIterator<'a> {
+    // index, (y, x), val
+    type Item = ((i32, i32), i32);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.curr <= self.end {
+            let y = self.curr / self.state.size;
+            let x = self.curr % self.state.size;
+
+            let old = self.curr;
+            self.curr += 1;
+
+            Some(((y as i32, x as i32), self.state.table[old]))
+        } else {
+            None
+        }
     }
 }

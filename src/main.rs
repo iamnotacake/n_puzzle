@@ -29,4 +29,10 @@ fn main() {
     let goal = state.goal();
     println!("Need:");
     print!("{}", goal);
+
+    let goal_positions = goal.goal_positions();
+
+    for (val, (y, x)) in goal_positions.iter().enumerate() {
+        eprintln!("({}, {}) must be {}", y, x, val);
+    }
 }
