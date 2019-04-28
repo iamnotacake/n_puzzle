@@ -40,8 +40,8 @@ impl fmt::Display for State {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         writeln!(
             f,
-            "┌{}────┐",
-            "────┬".repeat(self.size - 1)
+            "┌{}─────┐",
+            "─────┬".repeat(self.size - 1)
         )?;
 
         for y in 0..self.size {
@@ -49,8 +49,8 @@ impl fmt::Display for State {
                 let number = self.table[y * self.size + x];
 
                 match number {
-                    0 => write!(f, "│    ")?,
-                    _ => write!(f, "│ {:2} ", number)?,
+                    0 => write!(f, "│     ")?,
+                    _ => write!(f, "│ {:3} ", number)?,
                 }
             }
             writeln!(f, "│")?;
@@ -58,16 +58,16 @@ impl fmt::Display for State {
             if y < self.size - 1 {
                 writeln!(
                     f,
-                    "├{}────┤",
-                    "────┼".repeat(self.size - 1)
+                    "├{}─────┤",
+                    "─────┼".repeat(self.size - 1)
                 )?;
             }
         }
 
         writeln!(
             f,
-            "└{}────┘",
-            "────┴".repeat(self.size - 1)
+            "└{}─────┘",
+            "─────┴".repeat(self.size - 1)
         )?;
 
         Ok(())
