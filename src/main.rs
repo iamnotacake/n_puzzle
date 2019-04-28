@@ -1,49 +1,8 @@
-use std::fmt;
+extern crate n_puzzle;
+
 use std::io::prelude::*;
 
-#[derive(Clone)]
-struct State {
-    size: usize,
-    table: Vec<i32>,
-}
-
-impl fmt::Display for State {
-    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        writeln!(
-            f,
-            "┌{}────┐",
-            "────┬".repeat(self.size - 1)
-        )?;
-
-        for y in 0..self.size {
-            for x in 0..self.size {
-                let number = self.table[y * self.size + x];
-
-                match number {
-                    0 => write!(f, "│    ")?,
-                    _ => write!(f, "│ {:2} ", number)?,
-                }
-            }
-            writeln!(f, "│")?;
-
-            if y < self.size - 1 {
-                writeln!(
-                    f,
-                    "├{}────┤",
-                    "────┼".repeat(self.size - 1)
-                )?;
-            }
-        }
-
-        writeln!(
-            f,
-            "└{}────┘",
-            "────┴".repeat(self.size - 1)
-        )?;
-
-        Ok(())
-    }
-}
+use n_puzzle::State;
 
 fn main() {
     let mut input = String::new();
@@ -56,8 +15,7 @@ fn main() {
 
     let size = iter.next().unwrap() as usize;
     let table: Vec<i32> = iter.take(size * size).collect();
-    assert_eq!(table.len(), size * size);
 
-    let state = State { size, table };
+    let state = State::new(size, table);
     print!("{}", state);
 }
