@@ -7,18 +7,19 @@ use crossterm_terminal::ClearType;
 use n_puzzle::{MoveDirection, State};
 
 fn solve(
-    state: &State,
     goal: &State,
     goal_positions: &Vec<(i32, i32)>,
+    stack: &mut Vec<(MoveDirection, i32, State)>,
+    state: &State,
     level: usize,
     last_move: Option<MoveDirection>,
-) {
+) -> bool {
     if level > 20 {
-        return;
+        return false;
     }
 
     if state == goal {
-        panic!("SOLVED!");
+        return true;
     }
 
     let moves = state.moves(goal_positions);
@@ -38,14 +39,23 @@ fn solve(
             _ => {}
         }
 
-        solve(
-            &new_state,
+        // stack.push((*direction, *dist, *new_state));
+
+        if solve(
             goal,
             goal_positions,
+            stack,
+            &new_state,
             level + 1,
             Some(*direction),
-        );
+        ) {
+            return true;
+        } else {
+            // stack.pop();
+        }
     }
+
+    return false;
 }
 
 fn main() {
@@ -73,6 +83,13 @@ fn main() {
     print!("{}", goal);
 
     let goal_positions = goal.goal_positions();
+    let mut stack = Vec::with_capacity(128);
 
-    solve(&state, &goal, &goal_positions, 0, None);
+    let ret = solve(&goal, &goal_positions, &mut stack, &state, 0, None);
+
+    if ret {
+        println!("Solved with {} moves", stack.len());
+    } else {
+        println!("Not solved");
+    }
 }
