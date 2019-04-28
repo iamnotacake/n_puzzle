@@ -4,7 +4,49 @@ extern crate n_puzzle;
 use std::io::prelude::*;
 
 use crossterm_terminal::ClearType;
-use n_puzzle::State;
+use n_puzzle::{MoveDirection, State};
+
+fn solve(
+    state: &State,
+    goal: &State,
+    goal_positions: &Vec<(i32, i32)>,
+    level: usize,
+    last_move: Option<MoveDirection>,
+) {
+    if level > 20 {
+        return;
+    }
+
+    if state == goal {
+        panic!("SOLVED!");
+    }
+
+    let moves = state.moves(goal_positions);
+    for (direction, dist, new_state) in &moves {
+        println!(
+            "level {:4} direction {:?}  \ttotal_distance {}",
+            level, direction, dist
+        );
+
+        match (last_move, direction) {
+            (Some(MoveDirection::Left), MoveDirection::Right)
+            | (Some(MoveDirection::Right), MoveDirection::Left)
+            | (Some(MoveDirection::Up), MoveDirection::Down)
+            | (Some(MoveDirection::Down), MoveDirection::Up) => {
+                continue;
+            }
+            _ => {}
+        }
+
+        solve(
+            &new_state,
+            goal,
+            goal_positions,
+            level + 1,
+            Some(*direction),
+        );
+    }
+}
 
 fn main() {
     let mut input = String::new();
@@ -32,9 +74,5 @@ fn main() {
 
     let goal_positions = goal.goal_positions();
 
-    for (val, (y, x)) in goal_positions.iter().enumerate() {
-        eprintln!("({}, {}) must be {}", y, x, val);
-    }
-
-    dbg!(state.total_manhattan_dist(&goal_positions));
+    solve(&state, &goal, &goal_positions, 0, None);
 }
