@@ -1,7 +1,9 @@
+extern crate crossterm_terminal;
 extern crate n_puzzle;
 
 use std::io::prelude::*;
 
+use crossterm_terminal::ClearType;
 use n_puzzle::State;
 
 fn main() {
@@ -16,6 +18,10 @@ fn main() {
     let size = iter.next().unwrap() as usize;
     let table: Vec<i32> = iter.take(size * size).collect();
 
+    let terminal = crossterm_terminal::Terminal::new();
+
     let state = State::new(size, table);
+
+    // terminal.clear(ClearType::All);
     print!("{}", state);
 }
