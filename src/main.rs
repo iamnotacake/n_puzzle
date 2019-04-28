@@ -9,11 +9,11 @@ use n_puzzle::{MoveDirection, State};
 fn solve(
     goal: &State,
     goal_positions: &Vec<(i32, i32)>,
-    stack: &mut Vec<State>,
+    stack: &mut Vec<(MoveDirection, State)>,
     level: usize,
-    last_move: MoveDirection,
 ) -> bool {
-    let state = &stack[stack.len() - 1];
+    let (last_move, state) = &stack[stack.len() - 1];
+    let last_move = last_move.clone();
 
     if level > 20 {
         return false;
@@ -25,7 +25,7 @@ fn solve(
 
     let moves = state.moves(goal_positions);
     for (direction, dist, new_state) in moves {
-        eprintln!(
+        println!(
             "{}level {:4} total_distance {:2} direction {:?}",
             " ".repeat(level),
             level,
@@ -43,9 +43,9 @@ fn solve(
             _ => {}
         }
 
-        stack.push(new_state);
+        stack.push((direction, new_state));
 
-        if solve(goal, goal_positions, stack, level + 1, direction) {
+        if solve(goal, goal_positions, stack, level + 1) {
             return true;
         } else {
             stack.pop();
@@ -81,9 +81,9 @@ fn main() {
 
     let goal_positions = goal.goal_positions();
     let mut stack = Vec::with_capacity(128);
-    stack.push(state.clone());
+    stack.push((MoveDirection::None, state.clone()));
 
-    let ret = solve(&goal, &goal_positions, &mut stack, 0, MoveDirection::None);
+    let ret = solve(&goal, &goal_positions, &mut stack, 0);
 
     if ret {
         println!("Solved with {} moves", stack.len() - 1);
