@@ -4,13 +4,25 @@ use std::fmt;
 pub struct State {
     size: usize,
     table: Vec<i32>,
+    // Position of empty (zero) cell
+    empty: (i32, i32),
 }
 
 impl State {
     pub fn new(size: usize, table: Vec<i32>) -> State {
         assert_eq!(table.len(), size * size);
 
-        State { size, table }
+        let empty_index = table
+            .iter()
+            .enumerate()
+            .filter(|(_idx, &val)| val == 0)
+            .nth(0)
+            .unwrap()
+            .0;
+
+        let empty = ((empty_index / size) as i32, (empty_index % size) as i32);
+
+        State { size, table, empty }
     }
 
     #[inline]
