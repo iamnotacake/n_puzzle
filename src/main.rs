@@ -9,11 +9,12 @@ use n_puzzle::{MoveDirection, State};
 fn solve(
     goal: &State,
     goal_positions: &Vec<(i32, i32)>,
-    stack: &mut Vec<(MoveDirection, i32, State)>,
-    state: &State,
+    stack: &mut Vec<State>,
     level: usize,
-    last_move: Option<MoveDirection>,
+    last_move: MoveDirection,
 ) -> bool {
+    let state = &stack[stack.len() - 1];
+
     if level > 20 {
         return false;
     }
@@ -23,35 +24,31 @@ fn solve(
     }
 
     let moves = state.moves(goal_positions);
-    for (direction, dist, new_state) in &moves {
-        println!(
-            "level {:4} direction {:?}  \ttotal_distance {}",
-            level, direction, dist
+    for (direction, dist, new_state) in moves {
+        eprintln!(
+            "{}level {:4} total_distance {:2} direction {:?}",
+            " ".repeat(level),
+            level,
+            dist,
+            direction
         );
 
         match (last_move, direction) {
-            (Some(MoveDirection::Left), MoveDirection::Right)
-            | (Some(MoveDirection::Right), MoveDirection::Left)
-            | (Some(MoveDirection::Up), MoveDirection::Down)
-            | (Some(MoveDirection::Down), MoveDirection::Up) => {
+            (MoveDirection::Left, MoveDirection::Right)
+            | (MoveDirection::Right, MoveDirection::Left)
+            | (MoveDirection::Up, MoveDirection::Down)
+            | (MoveDirection::Down, MoveDirection::Up) => {
                 continue;
             }
             _ => {}
         }
 
-        // stack.push((*direction, *dist, *new_state));
+        stack.push(new_state);
 
-        if solve(
-            goal,
-            goal_positions,
-            stack,
-            &new_state,
-            level + 1,
-            Some(*direction),
-        ) {
+        if solve(goal, goal_positions, stack, level + 1, direction) {
             return true;
         } else {
-            // stack.pop();
+            stack.pop();
         }
     }
 
@@ -84,11 +81,12 @@ fn main() {
 
     let goal_positions = goal.goal_positions();
     let mut stack = Vec::with_capacity(128);
+    stack.push(state.clone());
 
-    let ret = solve(&goal, &goal_positions, &mut stack, &state, 0, None);
+    let ret = solve(&goal, &goal_positions, &mut stack, 0, MoveDirection::None);
 
     if ret {
-        println!("Solved with {} moves", stack.len());
+        println!("Solved with {} moves", stack.len() - 1);
     } else {
         println!("Not solved");
     }

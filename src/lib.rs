@@ -4,6 +4,7 @@ pub use state::State;
 
 #[derive(Copy, Clone, Debug)]
 pub enum MoveDirection {
+    None,
     Up,
     Down,
     Left,
