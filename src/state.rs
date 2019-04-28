@@ -1,7 +1,7 @@
-use super::manhattan_dist;
+use super::{manhattan_dist, MoveDirection};
 use std::fmt;
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct State {
     size: usize,
     table: Vec<i32>,
@@ -157,6 +157,84 @@ impl<'a> State {
         }
 
         total_dist
+    }
+
+    /// Returns list of possible moves, with distances calculated
+    pub fn moves(&self, goal: &Vec<(i32, i32)>) -> Vec<(MoveDirection, i32, State)> {
+        let mut res = Vec::with_capacity(4);
+        let (y, x) = (self.empty.0 as usize, self.empty.1 as usize);
+
+        if (self.empty.0 as usize) < self.size - 1 {
+            // Up
+            let mut table = self.table.clone();
+
+            table[y * self.size + x] = table[(y + 1) * self.size + x];
+            table[(y + 1) * self.size + x] = 0;
+
+            let state = State {
+                size: self.size,
+                table,
+                empty: (y as i32 + 1, x as i32),
+            };
+
+            res.push((MoveDirection::Up, state.total_manhattan_dist(goal), state));
+        }
+
+        if (self.empty.0 as usize) > 0 {
+            // Down
+            let mut table = self.table.clone();
+
+            table[y * self.size + x] = table[(y - 1) * self.size + x];
+            table[(y - 1) * self.size + x] = 0;
+
+            let state = State {
+                size: self.size,
+                table,
+                empty: (y as i32 - 1, x as i32),
+            };
+
+            res.push((MoveDirection::Down, state.total_manhattan_dist(goal), state));
+        }
+
+        if (self.empty.1 as usize) < self.size - 1 {
+            // Left
+            let mut table = self.table.clone();
+
+            table[y * self.size + x] = table[y * self.size + x + 1];
+            table[y * self.size + x + 1] = 0;
+
+            let state = State {
+                size: self.size,
+                table,
+                empty: (y as i32, x as i32 + 1),
+            };
+
+            res.push((MoveDirection::Left, state.total_manhattan_dist(goal), state));
+        }
+
+        if (self.empty.1 as usize) > 0 {
+            // Right
+            let mut table = self.table.clone();
+
+            table[y * self.size + x] = table[y * self.size + x - 1];
+            table[y * self.size + x - 1] = 0;
+
+            let state = State {
+                size: self.size,
+                table,
+                empty: (y as i32, x as i32 - 1),
+            };
+
+            res.push((
+                MoveDirection::Right,
+                state.total_manhattan_dist(goal),
+                state,
+            ));
+        }
+
+        res.sort_by_key(|(_direction, dist, _state)| dist.clone());
+
+        res
     }
 }
 

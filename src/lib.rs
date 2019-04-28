@@ -2,6 +2,14 @@ pub mod state;
 
 pub use state::State;
 
+#[derive(Copy, Clone, Debug)]
+pub enum MoveDirection {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
 // #[inline]
 // fn linear_dist<F>((y1, x1): (F, F), (y2, x2): (F, F)) -> f32
 // where
