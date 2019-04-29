@@ -10,6 +10,9 @@ use crossterm_terminal::ClearType;
 use n_puzzle::StrategyManhattan;
 use n_puzzle::{MoveDirection, State};
 
+const HEAP_SIZE_MAX: usize = 500_000;
+const HEAP_SIZE_SHRINK: usize = 50_000;
+
 fn read_input() -> String {
     let mut input = String::with_capacity(2048);
 
@@ -27,18 +30,37 @@ fn read_input() -> String {
     input
 }
 
+fn shrink_heap<T>(mut heap: BinaryHeap<T>) -> BinaryHeap<T>
+where
+    T: Ord,
+{
+    let mut new_heap = BinaryHeap::with_capacity(HEAP_SIZE_MAX);
+
+    for _ in 0..HEAP_SIZE_SHRINK {
+        new_heap.push(heap.pop().unwrap());
+    }
+
+    new_heap
+}
+
 fn solve_manhattan(state: State, goal: State) -> Option<Rc<StrategyManhattan>> {
     let goal_positions = goal.goal_positions();
 
-    let mut heap = BinaryHeap::with_capacity(4096);
-    let mut seen = HashSet::with_capacity(8192);
+    let mut heap = BinaryHeap::with_capacity(HEAP_SIZE_MAX + 1000);
+    let mut seen = HashSet::with_capacity(HEAP_SIZE_MAX);
 
     let start = StrategyManhattan::new(state, MoveDirection::None, None, &goal_positions);
     heap.push(start);
 
     loop {
-        if heap.len() % 10000 == 0 {
-            eprintln!("Heap size {}", heap.len());
+        if heap.len() >= HEAP_SIZE_MAX {
+            eprintln!(
+                "heap size {}, shrinking to {}, seen size {}",
+                heap.len(),
+                HEAP_SIZE_SHRINK,
+                seen.len()
+            );
+            heap = shrink_heap(heap);
         }
 
         if let Some(curr) = heap.pop() {
