@@ -27,6 +27,10 @@ impl<'a> State {
         State { size, table, empty }
     }
 
+    pub fn table(&'a self) -> &'a Vec<i32> {
+        &self.table
+    }
+
     fn cells(&'a self) -> StateCellIterator<'a> {
         StateCellIterator {
             state: &self,

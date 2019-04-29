@@ -124,6 +124,30 @@ fn walk_states(sd: &Rc<StateDiff>) -> Vec<Rc<StateDiff>> {
     vec
 }
 
+fn is_solvable(state: &State, goal: &State) -> bool {
+    let mut inversions = 0;
+    let s_table = state.table();
+    let g_table = goal.table();
+
+    for (idx, val) in s_table.iter().enumerate() {
+        let pos_in_goal = g_table.iter().position(|x| x == val).unwrap();
+
+        let have_on_right = &s_table[idx..];
+        let need_on_left = &g_table[..pos_in_goal];
+
+        let mut have_in_common = 0;
+        for e in have_on_right {
+            if need_on_left.iter().any(|x| x == e) {
+                have_in_common += 1;
+            }
+        }
+
+        inversions += have_in_common;
+    }
+
+    (inversions % 2) == 0
+}
+
 fn main() {
     let input = read_input();
 
@@ -146,11 +170,15 @@ fn main() {
     eprintln!("Need:");
     eprint!("{}", goal);
 
+    if !is_solvable(&state, &goal) {
+        eprintln!("This thing is unsolvable!");
+        return;
+    }
+
     if let Some(last) = solve(state, goal, State::total_manhattan_dist) {
         println!("{:?}", last);
 
         let states = walk_states(&last);
-        println!(">>> {} <<<", states.len());
 
         for state in states.iter().rev() {
             terminal.clear(ClearType::All);
