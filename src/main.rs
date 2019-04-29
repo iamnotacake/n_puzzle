@@ -79,9 +79,11 @@ fn solve(
 
             if curr.state == goal {
                 eprintln!(
-                    "Solved! heap size {}, seen size {}, moves count {}",
+                    "Solved! heap size/cap {}/{}, seen size/cap {}/{}, moves count {}",
                     heap.len(),
+                    heap.capacity(),
                     seen.len(),
+                    seen.capacity(),
                     curr.level
                 );
                 return Some(curr);
@@ -112,6 +114,16 @@ fn solve(
     }
 }
 
+fn walk_states(sd: &Rc<StateDiff>) -> Vec<Rc<StateDiff>> {
+    let mut vec = vec![sd.clone()];
+
+    if let Some(prev) = &sd.prev_state {
+        vec.extend(walk_states(prev));
+    }
+
+    vec
+}
+
 fn main() {
     let input = read_input();
 
@@ -135,6 +147,15 @@ fn main() {
     eprint!("{}", goal);
 
     if let Some(last) = solve(state, goal, State::total_manhattan_dist) {
-        print!("{}", last.state);
+        println!("{:?}", last);
+
+        let states = walk_states(&last);
+        println!(">>> {} <<<", states.len());
+
+        for state in states.iter().rev() {
+            terminal.clear(ClearType::All);
+            print!("{}", state.state);
+            std::thread::sleep_ms(100);
+        }
     }
 }

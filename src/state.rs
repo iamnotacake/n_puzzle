@@ -173,6 +173,18 @@ impl<'a> State {
         total_dist as i32
     }
 
+    pub fn total_manhattan_dist_plus(&self, goal: &Vec<(i32, i32)>) -> i32 {
+        let mut total_dist = self.total_manhattan_dist(goal);
+
+        // for ((y, x), val) in self.cells() {
+        //     if val != 0 {
+        //         total_dist += manhattan_dist((y, x), goal[val as usize]);
+        //     }
+        // }
+
+        total_dist
+    }
+
     /// Returns list of possible moves, with distances calculated
     pub fn moves(&self, last_direction: MoveDirection) -> Vec<(MoveDirection, State)> {
         let mut res = Vec::with_capacity(4);
