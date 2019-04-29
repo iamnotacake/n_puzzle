@@ -161,16 +161,16 @@ impl<'a> State {
     }
 
     pub fn total_linear_dist(&self, goal: &Vec<(i32, i32)>) -> i32 {
-        let mut total_dist = 0;
+        let mut total_dist = 0.0;
 
         for ((y, x), val) in self.cells() {
             // don't count bad empty cell position
             if val != 0 {
-                total_dist += linear_dist((y, x), goal[val as usize]) as i32;
+                total_dist += linear_dist((y, x), goal[val as usize]);
             }
         }
 
-        total_dist
+        total_dist as i32
     }
 
     /// Returns list of possible moves, with distances calculated

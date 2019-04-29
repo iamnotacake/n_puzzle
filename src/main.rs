@@ -43,7 +43,7 @@ where
     new_heap
 }
 
-fn solve_manhattan(
+fn solve(
     state: State,
     goal: State,
     score_calculator: fn(&State, &Vec<(i32, i32)>) -> i32,
@@ -134,5 +134,7 @@ fn main() {
     eprintln!("Need:");
     eprint!("{}", goal);
 
-    solve_manhattan(state, goal, State::total_manhattan_dist);
+    if let Some(last) = solve(state, goal, State::total_manhattan_dist) {
+        print!("{}", last.state);
+    }
 }
