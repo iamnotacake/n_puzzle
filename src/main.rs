@@ -60,10 +60,25 @@ fn solve(
     return false;
 }
 
-fn main() {
-    let mut input = String::new();
+fn read_input() -> String {
+    let mut input = String::with_capacity(2048);
 
-    std::io::stdin().read_to_string(&mut input).unwrap();
+    for line in std::io::stdin().lock().lines() {
+        let line = line.unwrap();
+
+        if line.starts_with("#") {
+            continue;
+        }
+
+        input.push_str(&line);
+        input.push('\n');
+    }
+
+    input
+}
+
+fn main() {
+    let input = read_input();
 
     let mut iter = input
         .split_whitespace()

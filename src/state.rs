@@ -289,7 +289,7 @@ struct StateCellIterator<'a> {
 }
 
 impl<'a> Iterator for StateCellIterator<'a> {
-    // index, (y, x), val
+    // (y, x), val
     type Item = ((i32, i32), i32);
 
     fn next(&mut self) -> Option<Self::Item> {
