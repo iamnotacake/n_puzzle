@@ -14,17 +14,6 @@ pub enum MoveDirection {
     Right,
 }
 
-// #[inline]
-// fn linear_dist<F>((y1, x1): (F, F), (y2, x2): (F, F)) -> f32
-// where
-//     F: std::convert::Into<f32>,
-// {
-//     let dy = y1.into() - y2.into();
-//     let dx = x1.into() - x2.into();
-//
-//     f32::sqrt(dy * dy + dx * dx)
-// }
-
 #[inline]
 fn linear_dist((y1, x1): (i32, i32), (y2, x2): (i32, i32)) -> f32 {
     let dy = (y1 - y2) as f32;
@@ -58,10 +47,11 @@ impl StrategyManhattan {
         level: u16,
         direction: MoveDirection,
         prev_state: Option<(Rc<StrategyManhattan>)>,
+        score_calculator: fn(&State, &Vec<(i32, i32)>) -> i32,
         goal_positions: &Vec<(i32, i32)>,
     ) -> Rc<StrategyManhattan> {
         Rc::new(StrategyManhattan {
-            score: -state.total_manhattan_dist(&goal_positions),
+            score: -score_calculator(&state, &goal_positions),
             level,
             state,
             direction,
