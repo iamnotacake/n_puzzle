@@ -30,27 +30,25 @@ fn manhattan_dist((y1, x1): (i32, i32), (y2, x2): (i32, i32)) -> i32 {
     dy + dx
 }
 
-/// Strategy based on sum of manhattan distances.
-/// The less is sum, the more score this state gets.
 #[derive(Debug)]
-pub struct StrategyManhattan {
+pub struct StateDiff {
     pub score: i32,
     pub level: u16,
     pub state: State,
     pub direction: MoveDirection,
-    pub prev_state: Option<(Rc<StrategyManhattan>)>,
+    pub prev_state: Option<(Rc<StateDiff>)>,
 }
 
-impl StrategyManhattan {
+impl StateDiff {
     pub fn new(
         state: State,
         level: u16,
         direction: MoveDirection,
-        prev_state: Option<(Rc<StrategyManhattan>)>,
+        prev_state: Option<(Rc<StateDiff>)>,
         score_calculator: fn(&State, &Vec<(i32, i32)>) -> i32,
         goal_positions: &Vec<(i32, i32)>,
-    ) -> Rc<StrategyManhattan> {
-        Rc::new(StrategyManhattan {
+    ) -> Rc<StateDiff> {
+        Rc::new(StateDiff {
             score: -score_calculator(&state, &goal_positions),
             level,
             state,
@@ -60,16 +58,16 @@ impl StrategyManhattan {
     }
 }
 
-impl PartialEq<StrategyManhattan> for StrategyManhattan {
+impl PartialEq<StateDiff> for StateDiff {
     #[inline]
-    fn eq(&self, other: &StrategyManhattan) -> bool {
+    fn eq(&self, other: &StateDiff) -> bool {
         self.score == other.score
     }
 }
 
-impl PartialOrd<StrategyManhattan> for StrategyManhattan {
+impl PartialOrd<StateDiff> for StateDiff {
     #[inline]
-    fn partial_cmp(&self, other: &StrategyManhattan) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &StateDiff) -> Option<Ordering> {
         if self.score < other.score {
             return Some(Ordering::Less);
         } else if self.score > other.score {
@@ -80,11 +78,11 @@ impl PartialOrd<StrategyManhattan> for StrategyManhattan {
     }
 }
 
-impl Eq for StrategyManhattan {}
+impl Eq for StateDiff {}
 
-impl Ord for StrategyManhattan {
+impl Ord for StateDiff {
     #[inline]
-    fn cmp(&self, other: &StrategyManhattan) -> Ordering {
+    fn cmp(&self, other: &StateDiff) -> Ordering {
         if self.score < other.score {
             return Ordering::Less;
         } else if self.score > other.score {
@@ -95,7 +93,7 @@ impl Ord for StrategyManhattan {
     }
 }
 
-impl Hash for StrategyManhattan {
+impl Hash for StateDiff {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.state.hash(state)
     }

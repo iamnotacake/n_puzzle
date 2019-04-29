@@ -7,7 +7,7 @@ use std::io::prelude::*;
 use std::rc::Rc;
 
 use crossterm_terminal::ClearType;
-use n_puzzle::StrategyManhattan;
+use n_puzzle::StateDiff;
 use n_puzzle::{MoveDirection, State};
 
 const HEAP_SIZE_MAX: usize = 500_000;
@@ -47,13 +47,13 @@ fn solve_manhattan(
     state: State,
     goal: State,
     score_calculator: fn(&State, &Vec<(i32, i32)>) -> i32,
-) -> Option<Rc<StrategyManhattan>> {
+) -> Option<Rc<StateDiff>> {
     let goal_positions = goal.goal_positions();
 
     let mut heap = BinaryHeap::with_capacity(HEAP_SIZE_MAX + 1000);
     let mut seen = HashSet::with_capacity(HEAP_SIZE_MAX);
 
-    let start = StrategyManhattan::new(
+    let start = StateDiff::new(
         state,
         0,
         MoveDirection::None,
@@ -88,7 +88,7 @@ fn solve_manhattan(
             }
 
             for (direction, new_state) in curr.state.moves(curr.direction.clone()) {
-                let next = StrategyManhattan::new(
+                let next = StateDiff::new(
                     new_state,
                     curr.level + 1,
                     direction,
