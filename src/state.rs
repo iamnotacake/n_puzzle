@@ -1,7 +1,8 @@
 use super::{manhattan_dist, MoveDirection};
+use std::cmp::{Eq, PartialEq};
 use std::fmt;
 
-#[derive(Clone)]
+#[derive(Clone, Hash, Debug)]
 pub struct State {
     size: usize,
     table: Vec<i32>,
@@ -160,11 +161,11 @@ impl<'a> State {
     }
 
     /// Returns list of possible moves, with distances calculated
-    pub fn moves(&self, goal: &Vec<(i32, i32)>) -> Vec<(MoveDirection, i32, State)> {
+    pub fn moves(&self, last_direction: MoveDirection) -> Vec<(MoveDirection, State)> {
         let mut res = Vec::with_capacity(4);
         let (y, x) = (self.empty.0 as usize, self.empty.1 as usize);
 
-        if (self.empty.0 as usize) < self.size - 1 {
+        if (self.empty.0 as usize) < self.size - 1 && last_direction != MoveDirection::Down {
             // Up
             let mut table = self.table.clone();
 
@@ -177,10 +178,10 @@ impl<'a> State {
                 empty: (y as i32 + 1, x as i32),
             };
 
-            res.push((MoveDirection::Up, state.total_manhattan_dist(goal), state));
+            res.push((MoveDirection::Up, state));
         }
 
-        if (self.empty.0 as usize) > 0 {
+        if (self.empty.0 as usize) > 0 && last_direction != MoveDirection::Up {
             // Down
             let mut table = self.table.clone();
 
@@ -193,10 +194,10 @@ impl<'a> State {
                 empty: (y as i32 - 1, x as i32),
             };
 
-            res.push((MoveDirection::Down, state.total_manhattan_dist(goal), state));
+            res.push((MoveDirection::Down, state));
         }
 
-        if (self.empty.1 as usize) < self.size - 1 {
+        if (self.empty.1 as usize) < self.size - 1 && last_direction != MoveDirection::Right {
             // Left
             let mut table = self.table.clone();
 
@@ -209,10 +210,10 @@ impl<'a> State {
                 empty: (y as i32, x as i32 + 1),
             };
 
-            res.push((MoveDirection::Left, state.total_manhattan_dist(goal), state));
+            res.push((MoveDirection::Left, state));
         }
 
-        if (self.empty.1 as usize) > 0 {
+        if (self.empty.1 as usize) > 0 && last_direction != MoveDirection::Left {
             // Right
             let mut table = self.table.clone();
 
@@ -225,14 +226,8 @@ impl<'a> State {
                 empty: (y as i32, x as i32 - 1),
             };
 
-            res.push((
-                MoveDirection::Right,
-                state.total_manhattan_dist(goal),
-                state,
-            ));
+            res.push((MoveDirection::Right, state));
         }
-
-        res.sort_by_key(|(_direction, dist, _state)| dist.clone());
 
         res
     }
@@ -276,11 +271,13 @@ impl fmt::Display for State {
     }
 }
 
-impl std::cmp::PartialEq<State> for State {
+impl PartialEq<State> for State {
     fn eq(&self, other: &State) -> bool {
         self.table == other.table
     }
 }
+
+impl Eq for State {}
 
 struct StateCellIterator<'a> {
     state: &'a State,
