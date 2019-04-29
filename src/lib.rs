@@ -46,6 +46,7 @@ fn manhattan_dist((y1, x1): (i32, i32), (y2, x2): (i32, i32)) -> i32 {
 #[derive(Debug)]
 pub struct StrategyManhattan {
     pub score: i32,
+    pub level: u16,
     pub state: State,
     pub direction: MoveDirection,
     pub prev_state: Option<(Rc<StrategyManhattan>)>,
@@ -54,12 +55,14 @@ pub struct StrategyManhattan {
 impl StrategyManhattan {
     pub fn new(
         state: State,
+        level: u16,
         direction: MoveDirection,
         prev_state: Option<(Rc<StrategyManhattan>)>,
         goal_positions: &Vec<(i32, i32)>,
     ) -> Rc<StrategyManhattan> {
         Rc::new(StrategyManhattan {
             score: -state.total_manhattan_dist(&goal_positions),
+            level,
             state,
             direction,
             prev_state,

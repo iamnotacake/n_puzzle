@@ -49,7 +49,7 @@ fn solve_manhattan(state: State, goal: State) -> Option<Rc<StrategyManhattan>> {
     let mut heap = BinaryHeap::with_capacity(HEAP_SIZE_MAX + 1000);
     let mut seen = HashSet::with_capacity(HEAP_SIZE_MAX);
 
-    let start = StrategyManhattan::new(state, MoveDirection::None, None, &goal_positions);
+    let start = StrategyManhattan::new(state, 0, MoveDirection::None, None, &goal_positions);
     heap.push(start);
 
     loop {
@@ -67,13 +67,19 @@ fn solve_manhattan(state: State, goal: State) -> Option<Rc<StrategyManhattan>> {
             // eprintln!("heap -> score {}", curr.score);
 
             if curr.state == goal {
-                eprintln!("Solved! Heap size {}, seen size {}", heap.len(), seen.len());
+                eprintln!(
+                    "Solved! heap size {}, seen size {}, moves count {}",
+                    heap.len(),
+                    seen.len(),
+                    curr.level
+                );
                 return Some(curr);
             }
 
             for (direction, new_state) in curr.state.moves(curr.direction.clone()) {
                 let next = StrategyManhattan::new(
                     new_state,
+                    curr.level + 1,
                     direction,
                     Some(curr.clone()),
                     &goal_positions,
