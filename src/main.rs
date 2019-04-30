@@ -54,6 +54,7 @@ fn solve(
 
     let mut heap = BinaryHeap::with_capacity(HEAP_SIZE_MAX + 1000);
     let mut seen = HashSet::with_capacity(HEAP_SIZE_MAX);
+    let mut max_level = 0;
 
     let start = StateDiff::new(
         state,
@@ -83,15 +84,15 @@ fn solve(
         if let Some(curr) = heap.pop() {
             // eprintln!("heap -> score {}", curr.score);
 
+            max_level = max_level.max(curr.level);
+
             if curr.state == goal {
-                eprintln!(
-                    "Solved! heap size/cap {}/{}, seen size/cap {}/{}, moves count {}",
-                    heap.len(),
-                    heap.capacity(),
-                    seen.len(),
-                    seen.capacity(),
-                    curr.level
-                );
+                eprintln!("Solved!");
+                eprintln!("==========================");
+                eprintln!("moves{:10}/{:<10}", curr.level, max_level);
+                eprintln!("heap {:10}/{:<10}", heap.len(), heap.capacity());
+                eprintln!("seen {:10}/{:<10}", seen.len(), seen.capacity());
+                eprintln!("==========================");
                 return Some(curr);
             }
 
