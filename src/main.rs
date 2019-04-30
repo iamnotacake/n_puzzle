@@ -1,3 +1,4 @@
+extern crate argparse;
 extern crate crossterm_terminal;
 extern crate n_puzzle;
 
@@ -149,6 +150,25 @@ fn is_solvable(state: &State, goal: &State) -> bool {
 }
 
 fn main() {
+    let mut flag_interactive = false;
+    let mut flag_interactive_delay = 100;
+
+    {
+        let mut ap = argparse::ArgumentParser::new();
+        ap.set_description("N-puzzle solver");
+        ap.refer(&mut flag_interactive).add_option(
+            &["-i", "--interactive"],
+            argparse::StoreTrue,
+            "Show step-by-step solution. Default: false",
+        );
+        ap.refer(&mut flag_interactive_delay).add_option(
+            &["-d", "--delay"],
+            argparse::Store,
+            "Delay between showing steps, ms. Default: 100",
+        );
+        ap.parse_args_or_exit();
+    }
+
     let input = read_input();
 
     let mut iter = input
@@ -162,7 +182,6 @@ fn main() {
 
     let state = State::new(size, table);
 
-    // terminal.clear(ClearType::All);
     eprintln!("Have:");
     eprint!("{}", state);
 
@@ -176,14 +195,15 @@ fn main() {
     }
 
     if let Some(last) = solve(state, goal, State::total_manhattan_dist) {
-        println!("{:?}", last);
+        if flag_interactive {
+            std::thread::sleep_ms(2000);
+            let states = walk_states(&last);
 
-        let states = walk_states(&last);
-
-        for state in states.iter().rev() {
-            terminal.clear(ClearType::All);
-            print!("{}", state.state);
-            std::thread::sleep_ms(100);
+            for state in states.iter().rev() {
+                terminal.clear(ClearType::All);
+                print!("{}", state.state);
+                std::thread::sleep_ms(flag_interactive_delay);
+            }
         }
     }
 }

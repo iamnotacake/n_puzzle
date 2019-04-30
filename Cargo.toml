@@ -7,4 +7,5 @@ authors = ["alischyn"]
 lto = true
 
 [dependencies]
-crossterm_terminal = "*"
+argparse = "0.2.2"
+crossterm_terminal = "0.2.2"
