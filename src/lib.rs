@@ -1,3 +1,5 @@
+extern crate crossterm;
+
 pub mod state;
 
 pub use state::State;

@@ -264,6 +264,9 @@ impl<'a> State {
 
 impl fmt::Display for State {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        let goal = self.goal().goal_positions();
+        let termcolor = crossterm::TerminalColor::new();
+
         writeln!(
             f,
             "┌{}─────┐",
@@ -276,7 +279,13 @@ impl fmt::Display for State {
 
                 match number {
                     0 => write!(f, "│     ")?,
-                    _ => write!(f, "│ {:3} ", number)?,
+                    n if goal[n as usize].0 == (y as i32) && goal[n as usize].1 == (x as i32) => {
+                        write!(f, "│ ")?;
+                        termcolor.set_fg(crossterm::Color::Green);
+                        write!(f, "{:3} ", n)?;
+                        termcolor.reset();
+                    }
+                    n => write!(f, "│ {:3} ", n)?,
                 }
             }
             writeln!(f, "│")?;
