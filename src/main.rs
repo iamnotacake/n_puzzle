@@ -11,8 +11,9 @@ use crossterm_terminal::ClearType;
 use n_puzzle::StateDiff;
 use n_puzzle::{MoveDirection, State};
 
-const HEAP_SIZE_MAX: usize = 500_000;
-const HEAP_SIZE_SHRINK: usize = 50_000;
+const HEAP_SIZE_MAX: usize = 400_000;
+const HEAP_SIZE_SHRINK: usize = 40_000;
+const SEEN_SIZE_MAX: usize = 10_000_000;
 
 fn read_input() -> String {
     let mut input = String::with_capacity(2048);
@@ -66,6 +67,10 @@ fn solve(
 
     loop {
         if heap.len() >= HEAP_SIZE_MAX {
+            if seen.len() >= SEEN_SIZE_MAX {
+                panic!("reached max seen size of {}", SEEN_SIZE_MAX);
+            }
+
             eprintln!(
                 "heap size {}, shrinking to {}, seen size {}",
                 heap.len(),
