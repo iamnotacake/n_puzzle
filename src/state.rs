@@ -180,11 +180,11 @@ impl<'a> State {
     pub fn total_manhattan_dist_plus(&self, goal: &Vec<(i32, i32)>) -> i32 {
         let mut total_dist = self.total_manhattan_dist(goal);
 
-        // for ((y, x), val) in self.cells() {
-        //     if val != 0 {
-        //         total_dist += manhattan_dist((y, x), goal[val as usize]);
-        //     }
-        // }
+        for ((y, x), val) in self.cells() {
+            if goal[val as usize].0 == y && goal[val as usize].1 == x {
+                total_dist -= 1;
+            }
+        }
 
         total_dist
     }

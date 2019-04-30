@@ -157,10 +157,28 @@ fn is_solvable(state: &State, goal: &State) -> bool {
 fn main() {
     let mut flag_interactive = false;
     let mut flag_interactive_delay = 100;
+    let mut flag_use_manhattan = false;
+    let mut flag_use_linear = false;
+    let mut flag_use_manhattan_plus = false;
 
     {
         let mut ap = argparse::ArgumentParser::new();
         ap.set_description("N-puzzle solver");
+        ap.refer(&mut flag_use_manhattan).add_option(
+            &["-1"],
+            argparse::StoreTrue,
+            "Use manhattan dist sum. Default: true",
+        );
+        ap.refer(&mut flag_use_linear).add_option(
+            &["-2"],
+            argparse::StoreTrue,
+            "Use linear dist sum. Default: false",
+        );
+        ap.refer(&mut flag_use_manhattan_plus).add_option(
+            &["-3"],
+            argparse::StoreTrue,
+            "Use manhattan dist sum minus number of goal positions. Default: false",
+        );
         ap.refer(&mut flag_interactive).add_option(
             &["-i", "--interactive"],
             argparse::StoreTrue,
@@ -199,7 +217,15 @@ fn main() {
         return;
     }
 
-    if let Some(last) = solve(state, goal, State::total_manhattan_dist) {
+    let func = if flag_use_linear {
+        State::total_linear_dist
+    } else if flag_use_manhattan_plus {
+        State::total_manhattan_dist_plus
+    } else {
+        State::total_manhattan_dist
+    };
+
+    if let Some(last) = solve(state, goal, func) {
         if flag_interactive {
             std::thread::sleep_ms(2000);
             let states = walk_states(&last);
